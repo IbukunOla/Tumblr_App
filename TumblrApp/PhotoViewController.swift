@@ -11,15 +11,14 @@ import AlamofireImage
 
 class PhotoViewController: UIViewController, UITableViewDataSource{
     
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet var tableView: UITableView!
     var posts:[[String: Any]] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.dataSource = self
-        print("About to Get posts")
+        tableView.rowHeight = 172
         getPosts()
-        print("Got posts")
     }
 
     func getPosts() {
@@ -33,7 +32,7 @@ class PhotoViewController: UIViewController, UITableViewDataSource{
             } else if let data = data {
                 let dataDict = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
                 let responseDict = dataDict["response"] as! [String: Any]
-                self.posts = responseDict["posts"] as! [[String:Any]]
+                self.posts = responseDict["posts"] as! [[String: Any]]
                 self.tableView.reloadData()
             }
         }
@@ -49,14 +48,14 @@ class PhotoViewController: UIViewController, UITableViewDataSource{
         let cell = tableView.dequeueReusableCell(withIdentifier: "PhotoCell", for: indexPath) as! PhotoTableViewCell
         
         let post = posts[indexPath.row]
-        if let photos = post["photos"] as? [[String: Any]] {
-            let photo = photos[0]
-            let originalSize = photo["orginalSize"] as! [String: Any]
-            let urlString = originalSize["url"] as! String
-            let url = URL(string: urlString)
+        let photos = post["photos"] as! [[String: Any]]
+        let photo = photos[0]
+        let originalSize = photo["original_size"] as! [String: Any]
+        let urlString = originalSize["url"] as! String
+        let url = URL(string: urlString)
+        
+        cell.postImageView.af_setImage(withURL: url!)
             
-            cell.postImageView.af_setImage(withURL: url!)
-        }
         return cell
     }
 
